@@ -1,0 +1,35 @@
+{% set data = load_setup_py_data(setup_file='../setup.py', from_recipe_dir=True) %}
+
+package:
+  name: nuscenes-devkit
+  version: {{ data['version'] }}
+
+source:
+  path: ../..
+
+build:
+  noarch: python  
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  host:
+    - python
+
+  run:
+    - python >=3.6
+
+    {% for dep in data['install_requires'] %}
+       {% if dep.startswith('opencv-python') %}
+    -     {{ dep|replace('opencv-python', 'opencv') }} # opencv-python is just opencv in conda
+       {% elif dep.startswith('pyquaternion') %}
+       {% else %}
+    -    {{ dep }}
+       {% endif %}
+    {% endfor %}
+
+about:
+  home: {{ data['url'] }}
+  summary: {{ data['description'] }}

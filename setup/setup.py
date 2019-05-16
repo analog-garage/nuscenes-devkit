@@ -8,23 +8,7 @@ with open('../README.md', 'r') as fh:
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-
-def get_dirlist(_rootdir):
-    dirlist = []
-
-    with os.scandir(_rootdir) as rit:
-        for entry in rit:
-            if not entry.name.startswith('.') and entry.is_dir():
-                dirlist.append(entry.path)
-                dirlist += get_dirlist(entry.path)
-
-    return dirlist
-
-
-# Get subfolders recursively
-os.chdir('..')
-rootdir = 'python-sdk'
-packages = [d.replace('/', '.').replace('{}.'.format(rootdir), '') for d in get_dirlist(rootdir)]
+rootdir = os.path.join(os.path.dirname(__file__), '..', 'python-sdk')
 
 setuptools.setup(
     name='nuscenes-devkit',
@@ -38,8 +22,8 @@ setuptools.setup(
     url='https://github.com/nutonomy/nuscenes-devkit',
     python_requires='>=3.6',
     install_requires=requirements,
-    packages=packages,
-    package_dir={'': 'python-sdk'},
+    packages=setuptools.find_packages(rootdir),
+    package_dir={'': rootdir},
     package_data={'': '*.json'},
     include_package_data=True,
     classifiers=[
